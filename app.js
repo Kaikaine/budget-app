@@ -20,7 +20,18 @@ let budgetController = (function() {
     totals: {
       exp: 0,
       inc: 0
-    }
+    },
+    budget: 0,
+    percentage: -1
+  };
+
+  let calculateTotal = function(type) {
+    let sum = 0;
+    data.allItems[type].forEach(curr => {
+      sum += curr.value;
+    });
+
+    data.totals[type] = sum;
   };
 
   // Public
@@ -41,6 +52,23 @@ let budgetController = (function() {
       // pushed into data structure
       data.allItems[type].push(newItem);
       return newItem;
+    },
+    calculateBudget: function() {
+      // calculate total inc and exp
+      calculateTotal("exp");
+      calculateTotal("inc");
+      // calculate budget
+      data.budget = data.totals.inc - data.totals.exp;
+      // calculate the percentage of income spent
+      data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+    },
+    getBudget: function() {
+      return {
+        budget: data.budget,
+        totalInc: data.totals.inc,
+        totalExp: data.totals.exp,
+        percentage: data.percentage
+      };
     }
   };
 })();
@@ -122,9 +150,13 @@ let controller = (function(budgetCtrl, UICtrl) {
     //
   };
   let updateBudget = function() {
+    let budget;
     // calculate the budget
+    budgetCtrl.calculateBudget();
     // return budget
+    budget = budgetCtrl.getBudget();
     // display budget on the UI
+    console.log(budget);
   };
   //
   let ctrlAddItem = function() {
